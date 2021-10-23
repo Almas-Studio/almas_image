@@ -1,20 +1,19 @@
+import 'dart:typed_data';
 import 'package:almas_image/src/operations/resolver.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'dart:ui' as ui;
 
+import 'operations/size.dart';
+
 class AlmasImage {
-  final img.Image image;
+  final ImageProvider image;
 
   const AlmasImage(this.image);
 
-  static Future<AlmasImage> fromImageProvider(
-      ImageProvider imageProvider) async {
-    final image = await resolveImage(imageProvider);
-    return AlmasImage(image);
-  }
+  Future<Size> get size => resolveSize(image);
 
-  Size get size => Size(image.width.toDouble(), image.height.toDouble());
+  Future<ui.Image> get uiImage => resolveUiImage(image);
 
-  List<int> get png => img.encodePng(image);
+  Future<Uint8List> get png async => uiImageToPngBytes(await uiImage);
 }
