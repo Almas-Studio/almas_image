@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'dart:ui' as ui;
 
+import 'operations/flip.dart';
 import 'operations/size.dart';
 
 class AlmasImage {
@@ -31,5 +32,13 @@ class AlmasImage {
 
     final provider = imageProviderFromImage(croppedImage);
     return AlmasImage(provider);
+  }
+
+  Future<AlmasImage> flipHorizontally() async {
+    return AlmasImage(await flipHorizontal(this.image));
+  }
+
+  Future<AlmasImage> flipVertically() async {
+    return AlmasImage(await flipVertical(this.image));
   }
 }
