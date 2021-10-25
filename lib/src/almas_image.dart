@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:almas_image/src/operations/provider.dart';
 import 'package:almas_image/src/operations/resolver.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'dart:ui' as ui;
@@ -35,10 +36,14 @@ class AlmasImage {
   }
 
   Future<AlmasImage> flipHorizontally() async {
-    return AlmasImage(await flipHorizontal(this.image));
+    final flippedImg = await compute(img.flipHorizontal,await imgImage);
+    final provider = imageProviderFromImage(flippedImg);
+    return AlmasImage(provider);
   }
 
   Future<AlmasImage> flipVertically() async {
-    return AlmasImage(await flipVertical(this.image));
+    final flippedImg = await compute(img.flipVertical,await imgImage);
+    final provider = imageProviderFromImage(flippedImg);
+    return AlmasImage(provider);
   }
 }
