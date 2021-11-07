@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'dart:ui' as ui;
 
-import 'operations/flip.dart';
 import 'operations/size.dart';
 
 class AlmasImage {
@@ -36,13 +35,22 @@ class AlmasImage {
   }
 
   Future<AlmasImage> flipHorizontally() async {
-    final flippedImg = await compute(img.flipHorizontal,await imgImage);
+    final flippedImg = await compute(img.flipHorizontal, await imgImage);
     final provider = imageProviderFromImage(flippedImg);
     return AlmasImage(provider);
   }
 
   Future<AlmasImage> flipVertically() async {
-    final flippedImg = await compute(img.flipVertical,await imgImage);
+/*    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+      // gpu
+      var bitmap = await Bitmap.fromProvider(image);
+      bitmap = bitmap.apply(BitmapFlip.vertical());
+      final flippedImg = await bitmap.buildImage();
+      final provider = await imageProviderFromUiImage(flippedImg);
+      return AlmasImage(provider);
+    }*/
+    // cpu
+    final flippedImg = await compute(img.flipVertical, await imgImage);
     final provider = imageProviderFromImage(flippedImg);
     return AlmasImage(provider);
   }
