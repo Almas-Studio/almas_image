@@ -54,4 +54,13 @@ class AlmasImage {
     final provider = imageProviderFromImage(flippedImg);
     return AlmasImage(provider);
   }
+
+  Future<AlmasImage> resize(Size size) async {
+    final resizedImage = await compute(
+      resizeImgImage,
+      ImageResizeParams(await imgImage, size),
+    );
+    final provider = imageProviderFromImage(resizedImage);
+    return AlmasImage(provider);
+  }
 }

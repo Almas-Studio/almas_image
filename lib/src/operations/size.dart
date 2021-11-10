@@ -29,10 +29,26 @@ Future<Size> resolveSize(ImageProvider image) async {
 
 Future<ui.Image> resizeUiImage(ui.Image image, int width, int height) async {
   var bytes = await uiImageToPngBytes(image);
-  var png = await img.decodePng(bytes);
-  var resized = await img.copyResize(png!, width: width, height: height);
-  var resizedBytes = await img.encodePng(resized);
-  var codec = await ui.instantiateImageCodec(Uint8List.fromList(resizedBytes), targetWidth: width, targetHeight: height);
+  var png = img.decodePng(bytes);
+  var resized = img.copyResize(png!, width: width, height: height);
+  var resizedBytes = img.encodePng(resized);
+  var codec = await ui.instantiateImageCodec(Uint8List.fromList(resizedBytes),
+      targetWidth: width, targetHeight: height);
   var frame = await codec.getNextFrame();
   return frame.image;
+}
+
+class ImageResizeParams {
+  final img.Image image;
+  final Size size;
+
+  ImageResizeParams(this.image, this.size);
+}
+
+Future<img.Image> resizeImgImage(ImageResizeParams params) async {
+  return img.copyResize(
+    params.image,
+    width: params.size.width.toInt(),
+    height: params.size.height.toInt(),
+  );
 }

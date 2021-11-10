@@ -5,9 +5,15 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 
-void resolve(ImageProvider img, ImageListener listener) => img
-    .resolve(ImageConfiguration())
-    .addListener(ImageStreamListener(listener));
+void resolve(ImageProvider img, ImageListener listener) {
+  final stream = img.resolve(ImageConfiguration());
+  late ImageStreamListener streamListener;
+  streamListener = ImageStreamListener((info, _) {
+    stream.removeListener(streamListener);
+    listener(info, _);
+  });
+  stream.addListener(streamListener);
+}
 
 Future<Uint8List> uiImageToPngBytes(ui.Image image) async {
   final bytes = (await image.toByteData(format: ui.ImageByteFormat.png))!;
@@ -29,7 +35,6 @@ Future<ui.Image> resolveUiImage(ImageProvider imageProvider) async {
 
   late ui.Image temp;
   await for (var result in resultController.stream) {
-    resultController.close();
     temp = result;
     break;
   }
