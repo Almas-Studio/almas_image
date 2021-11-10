@@ -35,6 +35,7 @@ Future<ui.Image> resolveUiImage(ImageProvider imageProvider) async {
 
   late ui.Image temp;
   await for (var result in resultController.stream) {
+    resultController.close();
     temp = result;
     break;
   }

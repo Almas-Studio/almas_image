@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:almas_image/src/operations/provider.dart';
 import 'package:almas_image/src/operations/resolver.dart';
@@ -35,20 +37,21 @@ class AlmasImage {
   }
 
   Future<AlmasImage> flipHorizontally() async {
-    final flippedImg = await compute(img.flipHorizontal, await imgImage);
-    final provider = imageProviderFromImage(flippedImg);
+    var recorder = ui.PictureRecorder();
+    var uimg = await uiImage;
+    var canvas = ui.Canvas(recorder);
+    final double dx = -(uimg.width / 2.0);
+    canvas.translate(-dx, 0);
+    canvas.scale(-1, 1);
+    canvas.translate(dx, 0.0);
+    canvas.drawImage(uimg, Offset.zero, Paint());
+    final pic = recorder.endRecording();
+    uimg = await pic.toImage(uimg.width, uimg.height);
+    final provider = await imageProviderFromUiImage(uimg);
     return AlmasImage(provider);
   }
 
   Future<AlmasImage> flipVertically() async {
-/*    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
-      // gpu
-      var bitmap = await Bitmap.fromProvider(image);
-      bitmap = bitmap.apply(BitmapFlip.vertical());
-      final flippedImg = await bitmap.buildImage();
-      final provider = await imageProviderFromUiImage(flippedImg);
-      return AlmasImage(provider);
-    }*/
     // cpu
     final flippedImg = await compute(img.flipVertical, await imgImage);
     final provider = imageProviderFromImage(flippedImg);
