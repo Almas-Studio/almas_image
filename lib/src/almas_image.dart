@@ -15,6 +15,10 @@ class AlmasImage {
 
   const AlmasImage(this.image);
 
+  factory AlmasImage.image(img.Image image){
+    return AlmasImage(imageProviderFromImage(image));
+  }
+
   Future<Size> get size => resolveSize(image);
 
   Future<ui.Image> get uiImage => resolveUiImage(image);
