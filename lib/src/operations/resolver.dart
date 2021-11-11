@@ -26,21 +26,14 @@ Future<Uint8List> uiImageToRGBABytes(ui.Image image) async {
 }
 
 Future<ui.Image> resolveUiImage(ImageProvider imageProvider) async {
-  final resultController = StreamController<ui.Image>();
+  final Completer<ui.Image> completer = Completer();
 
   resolve(
     imageProvider,
-    (info, _) => resultController.sink.add(info.image),
+    (info, synchronousCall) => completer.complete(info.image),
   );
 
-  late ui.Image temp;
-  await for (var result in resultController.stream) {
-    resultController.close();
-    temp = result;
-    break;
-  }
-
-  return temp;
+  return completer.future;
 }
 
 Future<img.Image> resolveImage(ImageProvider imageProvider) async {
