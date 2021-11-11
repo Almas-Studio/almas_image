@@ -15,8 +15,12 @@ class AlmasImage {
 
   const AlmasImage(this.image);
 
-  factory AlmasImage.image(img.Image image){
+  factory AlmasImage.image(img.Image image) {
     return AlmasImage(imageProviderFromImage(image));
+  }
+
+  static Future<AlmasImage> fromUi(ui.Image image) async{
+    return AlmasImage(await imageProviderFromUiImage(image));
   }
 
   Future<Size> get size => resolveSize(image);
@@ -71,11 +75,17 @@ class AlmasImage {
   }
 
   Future<AlmasImage> resize(Size size) async {
-    final resizedImage = await compute(
+    return AlmasImage(ResizeImage(
+      image,
+      width: size.width.toInt(),
+      height: size.height.toInt(),
+      allowUpscaling: true,
+    ));
+    /*final resizedImage = await compute(
       resizeImgImage,
       ImageResizeParams(await imgImage, size),
     );
     final provider = imageProviderFromImage(resizedImage);
-    return AlmasImage(provider);
+    return AlmasImage(provider);*/
   }
 }
