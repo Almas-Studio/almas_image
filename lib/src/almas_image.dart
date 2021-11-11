@@ -56,9 +56,17 @@ class AlmasImage {
   }
 
   Future<AlmasImage> flipVertically() async {
-    // cpu
-    final flippedImg = await compute(img.flipVertical, await imgImage);
-    final provider = imageProviderFromImage(flippedImg);
+    var recorder = ui.PictureRecorder();
+    var uimg = await uiImage;
+    var canvas = ui.Canvas(recorder);
+    final double dy = -(uimg.height / 2.0);
+    canvas.translate(0, -dy);
+    canvas.scale(1, -1);
+    canvas.translate(0.0, dy);
+    canvas.drawImage(uimg, Offset.zero, Paint());
+    final pic = recorder.endRecording();
+    uimg = await pic.toImage(uimg.width, uimg.height);
+    final provider = await imageProviderFromUiImage(uimg);
     return AlmasImage(provider);
   }
 
