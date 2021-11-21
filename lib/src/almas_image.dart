@@ -19,6 +19,10 @@ class AlmasImage {
     return AlmasImage(imageProviderFromImage(image));
   }
 
+  factory AlmasImage.fromBytes(Uint8List bytes) {
+    return AlmasImage(MemoryImage(bytes));
+  }
+
   static Future<AlmasImage> fromUi(ui.Image image) async{
     return AlmasImage(await imageProviderFromUiImage(image));
   }
