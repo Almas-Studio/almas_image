@@ -7,24 +7,17 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 
 Future<Size> resolveSize(ImageProvider image) async {
-  final resultController = StreamController<Size>();
+  final completer = Completer<Size>();
 
   resolve(image, (info, _) {
     final size = Size(
       info.image.width.toDouble(),
       info.image.height.toDouble(),
     );
-    resultController.sink.add(size);
+    completer.complete(size);
   });
 
-  late Size temp;
-  await for (var result in resultController.stream) {
-    resultController.close();
-    temp = result;
-    break;
-  }
-
-  return temp;
+  return completer.future;
 }
 
 Future<ui.Image> resizeUiImage(ui.Image image, int width, int height) async {

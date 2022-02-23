@@ -85,11 +85,5 @@ class AlmasImage {
       height: size.height.toInt(),
       allowUpscaling: true,
     ));
-    /*final resizedImage = await compute(
-      resizeImgImage,
-      ImageResizeParams(await imgImage, size),
-    );
-    final provider = imageProviderFromImage(resizedImage);
-    return AlmasImage(provider);*/
   }
 }
