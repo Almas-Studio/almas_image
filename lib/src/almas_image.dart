@@ -51,6 +51,10 @@ class AlmasImage {
     );
   }
 
+  Future<int> get frameCount async => (await codec).frameCount;
+
+  Future<bool> get animated async => (await frameCount) > 1;
+
   Future<AlmasImage> crop(Rect cropBox) async {
     final croppedImage = img.copyCrop(
       await imgImage,
