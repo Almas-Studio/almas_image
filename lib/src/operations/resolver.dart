@@ -21,7 +21,7 @@ Future<Uint8List> uiImageToPngBytes(ui.Image image) async {
 }
 
 Future<Uint8List> uiImageToRGBABytes(ui.Image image) async {
-  final bytes = (await image.toByteData(format: ui.ImageByteFormat.rawRgba))!;
+  final bytes = (await image.toByteData(format: ui.ImageByteFormat.rawUnmodified))!;
   return bytes.buffer.asUint8List(0, bytes.buffer.lengthInBytes);
 }
 
@@ -34,11 +34,6 @@ Future<ui.Image> resolveUiImage(ImageProvider imageProvider) async {
   );
 
   return completer.future;
-}
-
-Future<ByteBuffer> resolveBytes(ui.Image image) async{
-  final bytes = (await image.toByteData(format: ui.ImageByteFormat.rawUnmodified))!;
-  return bytes.buffer;
 }
 
 Future<img.Image> resolveImage(ImageProvider imageProvider) async {

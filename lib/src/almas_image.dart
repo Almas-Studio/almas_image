@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:math';
 import 'dart:typed_data';
@@ -35,14 +36,28 @@ class AlmasImage {
 
   Future<Uint8List> get png async => uiImageToPngBytes(await uiImage);
 
-  Future<ByteBuffer> get buffer async => resolveBytes(await uiImage);
-
-  Future<Uint8List> get rawBytes async {
-    final b = await buffer;
-    return b.asUint8List(0, b.lengthInBytes);
+  Future<Uint8List> get bytes async {
+    final completer = Completer<Uint8List>();
+    Future<ui.Codec> _c(bytes,
+        {allowUpscaling, cacheHeight, cacheWidth}) async {
+      completer.complete(bytes);
+      return ui.instantiateImageCodec(bytes);
+    }
+    image.load(image, _c);
+    return completer.future;
   }
 
-  Future<ui.Codec> get codec async => ui.instantiateImageCodec(await rawBytes);
+  Future<ui.Codec> get codec async {
+    final completer = Completer<ui.Codec>();
+    Future<ui.Codec> _c(bytes,
+        {allowUpscaling, cacheHeight, cacheWidth}) async {
+      final codec = await ui.instantiateImageCodec(bytes);
+      completer.complete(codec);
+      return codec;
+    }
+    image.load(image, _c);
+    return completer.future;
+  }
 
   Future<List<ui.FrameInfo>> get frames async {
     final c = await codec;
