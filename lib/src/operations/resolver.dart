@@ -36,6 +36,11 @@ Future<ui.Image> resolveUiImage(ImageProvider imageProvider) async {
   return completer.future;
 }
 
+Future<ByteBuffer> resolveBytes(ui.Image image) async{
+  final bytes = (await image.toByteData(format: ui.ImageByteFormat.rawUnmodified))!;
+  return bytes.buffer;
+}
+
 Future<img.Image> resolveImage(ImageProvider imageProvider) async {
   final loadedImage = await resolveUiImage(imageProvider);
   final bytes = await uiImageToRGBABytes(loadedImage);

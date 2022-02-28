@@ -23,7 +23,7 @@ class AlmasImage {
     return AlmasImage(MemoryImage(bytes));
   }
 
-  static Future<AlmasImage> fromUi(ui.Image image) async{
+  static Future<AlmasImage> fromUi(ui.Image image) async {
     return AlmasImage(await imageProviderFromUiImage(image));
   }
 
@@ -34,6 +34,22 @@ class AlmasImage {
   Future<img.Image> get imgImage => resolveImage(image);
 
   Future<Uint8List> get png async => uiImageToPngBytes(await uiImage);
+
+  Future<ByteBuffer> get buffer async => resolveBytes(await uiImage);
+
+  Future<Uint8List> get rawBytes async {
+    final b = await buffer;
+    return b.asUint8List(0, b.lengthInBytes);
+  }
+
+  Future<ui.Codec> get codec async => ui.instantiateImageCodec(await rawBytes);
+
+  Future<List<ui.FrameInfo>> get frames async {
+    final c = await codec;
+    return await Future.wait(
+      List.generate(c.frameCount, (i) => c.getNextFrame()),
+    );
+  }
 
   Future<AlmasImage> crop(Rect cropBox) async {
     final croppedImage = img.copyCrop(
