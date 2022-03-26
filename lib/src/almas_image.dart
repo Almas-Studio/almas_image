@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:developer' as dev;
-import 'dart:math';
 import 'dart:typed_data';
+import 'package:almas_image/almas_image.dart';
 import 'package:almas_image/src/operations/provider.dart';
 import 'package:almas_image/src/operations/resolver.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'dart:ui' as ui;
@@ -36,6 +34,13 @@ class AlmasImage {
 
   Future<Uint8List> get png async => uiImageToPngBytes(await uiImage);
 
+  Future<ui.Picture> get picture async {
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    canvas.drawImage(await uiImage, Offset.zero, Paint());
+    return recorder.endRecording();
+  }
+
   Future<Uint8List> get bytes async {
     final completer = Completer<Uint8List>();
     Future<ui.Codec> _c(bytes,
@@ -43,6 +48,7 @@ class AlmasImage {
       completer.complete(bytes);
       return ui.instantiateImageCodec(bytes);
     }
+
     image.load(image, _c);
     return completer.future;
   }
@@ -55,6 +61,7 @@ class AlmasImage {
       completer.complete(codec);
       return codec;
     }
+
     image.load(image, _c);
     return completer.future;
   }
@@ -71,15 +78,14 @@ class AlmasImage {
   Future<bool> get animated async => (await frameCount) > 1;
 
   Future<AlmasImage> crop(Rect cropBox) async {
-    final croppedImage = img.copyCrop(
-      await imgImage,
-      cropBox.left.toInt(),
-      cropBox.top.toInt(),
-      cropBox.width.toInt(),
-      cropBox.height.toInt(),
-    );
-
-    final provider = imageProviderFromImage(croppedImage);
+    var recorder = ui.PictureRecorder();
+    var uimg = await uiImage;
+    var canvas = ui.Canvas(recorder);
+    canvas.drawImageRect(uimg, cropBox,
+        Rect.fromLTWH(0, 0, cropBox.width, cropBox.height), Paint());
+    final pic = recorder.endRecording();
+    uimg = await pic.toImage(cropBox.width.toInt(), cropBox.height.toInt());
+    final provider = await imageProviderFromUiImage(uimg);
     return AlmasImage(provider);
   }
 
@@ -120,5 +126,45 @@ class AlmasImage {
       height: size.height.toInt(),
       allowUpscaling: true,
     ));
+  }
+
+  Future<AlmasImage> applyImageFilter(ui.ImageFilter filter) async {
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    final uimg = await uiImage;
+    canvas.drawImage(uimg, Offset.zero, Paint()..imageFilter = filter);
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(uimg.width, uimg.height);
+    return await AlmasImage.fromUi(image);
+  }
+
+  Future<AlmasImage> applyColorFilter(ui.ColorFilter filter) async {
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    final uimg = await uiImage;
+    canvas.drawImage(uimg, Offset.zero, Paint()..colorFilter = filter);
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(uimg.width, uimg.height);
+    return await AlmasImage.fromUi(image);
+  }
+
+  Future<AlmasImage> applyMaskFilter(ui.MaskFilter filter) async {
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    final uimg = await uiImage;
+    canvas.drawImage(uimg, Offset.zero, Paint()..maskFilter = filter);
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(uimg.width, uimg.height);
+    return await AlmasImage.fromUi(image);
+  }
+
+  Future<AlmasImage> applyShader(ui.Shader shader) async {
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    final uimg = await uiImage;
+    canvas.drawImage(uimg, Offset.zero, Paint()..shader = shader);
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(uimg.width, uimg.height);
+    return await AlmasImage.fromUi(image);
   }
 }
